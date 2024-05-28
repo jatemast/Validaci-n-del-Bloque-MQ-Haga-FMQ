@@ -21,12 +21,9 @@ class ValidationController extends Controller
     private function validateSyntax($code)
     {
         $lines = explode("\n", $code);
-        $stack = [];
-        $errors = [];
-
+        $stack = [];        $errors = [];
         foreach ($lines as $lineNumber => $line) {
             $line = trim($line);
-
             if (preg_match('/^\\s*MQ\\s*$/i', $line)) {
                 $stack[] = 'MQ';
             } elseif (preg_match('/^\\s*Haga\\s*$/i', $line)) {
@@ -37,17 +34,15 @@ class ValidationController extends Controller
                 } else {
                     array_pop($stack);
                 }
-            } elseif (preg_match('/^\\s*[a-zA-Z_]\\w*\\s*=\\s*\\d+\\s*;\\s*$/i', $line)) {
-                // No es necesario hacer nada aquí
+            } elseif (preg_match('/^\\s*\\$[a-zA-Z_][a-zA-Z0-9_]*\\s*=\\s*\\d+\\s*;\\s*$/i', $line)) {
+                // Asignación de variable numérica válida
             } elseif ($line !== '') {
                 $errors[] = "Sintaxis incorrecta en la línea " . ($lineNumber + 1);
             }
         }
-
         if (!empty($stack)) {
             $errors[] = "MQ sin cerrar";
         }
-
         return $errors;
     }
 }
